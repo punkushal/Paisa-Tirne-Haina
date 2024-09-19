@@ -14,6 +14,7 @@ class _HomeState extends State<Home> {
   final _amountController = TextEditingController();
   double amount = 0.0;
   int person = 0;
+  double _currentSliderValue = 0;
   @override
   void dispose() {
     _amountController.dispose();
@@ -22,10 +23,15 @@ class _HomeState extends State<Home> {
 
   void splittingCash() {
     if (_formKey.currentState!.validate() &&
-        double.parse(_amountController.text) > 0) {
+            double.parse(_amountController.text) > 0 ||
+        _currentSliderValue > 0) {
+      double tax = _currentSliderValue / 100;
       setState(() {
-        amount = double.parse(_amountController.text) /
-            double.parse(person.toString());
+        amount = tax == 0
+            ? ((double.parse(_amountController.text)) /
+                double.parse(person.toString()))
+            : ((double.parse(_amountController.text) * tax) /
+                double.parse(person.toString()));
       });
       return;
     } else {
@@ -186,6 +192,25 @@ class _HomeState extends State<Home> {
                         ],
                       )
                     ],
+                  ),
+
+                  Center(
+                    child: Text('${_currentSliderValue.toStringAsFixed(2)}%'),
+                  ),
+
+                  //Slider for adding percentage value
+                  Slider(
+                    value: _currentSliderValue,
+                    min: 0,
+                    max: 100,
+                    divisions: 100, // Divides the slider into steps of 1
+                    label: '${_currentSliderValue.round()}%',
+                    onChanged: (double value) {
+                      setState(() {
+                        _currentSliderValue = value;
+                      });
+                    },
+                    activeColor: Colors.redAccent,
                   ),
                 ],
               ),
