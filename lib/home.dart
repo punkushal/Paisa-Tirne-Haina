@@ -12,12 +12,41 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
-  final double amount = 0.0;
+  double amount = 0.0;
   int person = 0;
   @override
   void dispose() {
     _amountController.dispose();
     super.dispose();
+  }
+
+  void splittingCash() {
+    if (_formKey.currentState!.validate() &&
+        double.parse(_amountController.text) > 0) {
+      setState(() {
+        amount = double.parse(_amountController.text) /
+            double.parse(person.toString());
+      });
+      return;
+    } else {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('Invalid Input'),
+          content: Text("Enter amount first"),
+          actions: [
+            Center(
+              child: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.check),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
@@ -58,7 +87,7 @@ class _HomeState extends State<Home> {
                       height: 8,
                     ),
                     Text(
-                      'Rs $amount',
+                      'Rs ${amount.toStringAsFixed(2)}',
                       style: theme.textTheme.copyWith().titleLarge,
                     ),
                   ],
@@ -94,7 +123,19 @@ class _HomeState extends State<Home> {
                             color: const Color.fromARGB(255, 231, 88, 88),
                             width: 0.5),
                       ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(
+                            color: const Color.fromARGB(255, 231, 88, 88),
+                            width: 0.5),
+                      ),
                     ),
+                    validator: (value) {
+                      if (value == "") {
+                        return "Please enter amount";
+                      }
+                      return null;
+                    },
                   ),
 
                   SizedBox(
@@ -148,6 +189,11 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
+            ),
+
+            TextButton(
+              onPressed: splittingCash,
+              child: Text("Submit"),
             ),
           ],
         ),
